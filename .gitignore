@@ -1,0 +1,9 @@
+# Datasets
+dtd/
+imagenet/
+iNaturalist/
+Places/
+SUN/
+
+# Python
+__pycache__
