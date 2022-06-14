@@ -3,18 +3,19 @@ import os
 
 import torch
 
-def get_model(args, num_classes, load_ckpt=True):
+def get_model(args, num_classes, trainLoaderIn, load_ckpt=True):
+    if args.model_arch == 'resnet18':
+        from models.resnet import resnet18
+        model = resnet18(num_classes=num_classes, pretrained=args.pretrained)
+    elif args.model_arch == 'resnet50':
+        from models.resnet import resnet50
+        model = resnet50(args, num_classes=num_classes, pretrained=args.pretrained)
+    elif args.model_arch == 'mobilenet':
+        from models.mobilenet import mobilenet_v2
+        model = mobilenet_v2(num_classes=num_classes, pretrained=args.pretrained)
     if args.in_dataset == 'imagenet':
-        if args.model_arch == 'resnet18':
-            from models.resnet import resnet18
-            model = resnet18(num_classes=num_classes, pretrained=True)
-        elif args.model_arch == 'resnet50':
-            from models.resnet import resnet50
-            model = resnet50(num_classes=num_classes, pretrained=True)
-        elif args.model_arch == 'mobilenet':
-            from models.mobilenet import mobilenet_v2
-            model = mobilenet_v2(num_classes=num_classes, pretrained=True)
-    else:
+        pass
+    elif args.in_dataset == 'CIFAR-100':
         if args.model_arch == 'resnet18':
             from models.resnet import resnet18_cifar
             model = resnet18_cifar(num_classes=num_classes, method=args.method)
@@ -27,10 +28,45 @@ def get_model(args, num_classes, load_ckpt=True):
         if load_ckpt:
             checkpoint = torch.load("./checkpoints/{in_dataset}/{model_arch}/checkpoint_{epochs}.pth.tar".format(in_dataset=args.in_dataset, model_arch=args.name, epochs=args.epochs))
             model.load_state_dict(checkpoint['state_dict'])
+    else:
+        if args.model_arch == 'resnet50':
+            from models.resnet import resnet50
+            model = resnet50(args, num_classes=num_classes, pretrained=args.pretrained)
+        elif args.model_arch == 'mobilenet':
+            from models.mobilenet import mobilenet_v2
+            model = mobilenet_v2(num_classes=num_classes, pretrained=args.pretrained)
 
     model.cuda()
+
+    if not args.pretrained:
+        train_model(args, model, trainLoaderIn)
+        torch.save(model.state_dict(), os.path.join("models", "saves", f"{ args.model_arch }_{ args.in_dataset }.pth"))
+
     model.eval()
     # get the number of model parameters
     print('Number of model parameters: {}'.format(
         sum([p.data.nelement() for p in model.parameters()])))
     return model
+
+def train_model(args, model, trainLoaderIn):
+    criterion = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+
+    size = len(trainLoaderIn.dataset)
+    for epoch in range(args.epochs):
+        print(f"epoch { epoch + 1 }/{ args.epochs }")
+
+        for batch, (images, labels) in enumerate(trainLoaderIn):
+            images = images.cuda()
+            labels = labels.cuda()
+            optimizer.zero_grad()
+            model_output = model(images)
+            loss = criterion(model_output, labels)
+            loss.backward()
+            optimizer.step()
+
+            if batch % 100 == 0:
+                loss_printable = loss.item()
+                current = batch * len(images)
+                print(f"\tloss: { loss_printable } [{ current }/{ size }]")
+

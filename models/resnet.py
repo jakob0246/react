@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.nn as nn
 import math
@@ -353,10 +354,13 @@ def resnet18(pretrained=False, **kwargs):
     return model
 
 
-def resnet50(pretrained=False, **kwargs):
+def resnet50(args, pretrained=False, **kwargs):
     model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
     if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['resnet50']))
+        if args.in_dataset == "imagenet":
+            model.load_state_dict(model_zoo.load_url(model_urls['resnet50']))
+        else:
+            model.load_state_dict(torch.load(os.path.join("models", "saves", f"{ args.model_arch }_{ args.in_dataset }.pth")))
     return model
 
 

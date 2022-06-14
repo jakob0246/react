@@ -4,6 +4,19 @@ imagenet/
 iNaturalist/
 Places/
 SUN/
+rsicd_in/
+rsicd_out/
+mnist_fashion_in/
+mnist_fashion_out/
+xview2_in/
+xview2_out/
+rice_in/
+rice_out/
+sen12ms_in/
+sen12ms_out/
 
 # Python
 __pycache__
+
+# Models
+saves/

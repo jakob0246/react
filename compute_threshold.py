@@ -49,10 +49,10 @@ def eval_ood_detector(args):
     if not os.path.exists(in_save_dir):
         os.makedirs(in_save_dir)
 
-    loader_in_dict = get_loader_in(args, split=('val'))
-    loader, num_classes = loader_in_dict.val_loader, loader_in_dict.num_classes
+    loader_in_dict = get_loader_in(args)
+    trainLoaderIn, testLoaderIn, num_classes = loader_in_dict.train_loader, loader_in_dict.val_loader, loader_in_dict.num_classes
     # method_args['num_classes'] = num_classes
-    model = get_model(args, num_classes, load_ckpt=True)
+    model = get_model(args, num_classes, trainLoaderIn, load_ckpt=False)
 
 
     activation_log = []
@@ -61,7 +61,7 @@ def eval_ood_detector(args):
 
     count = 0
     lim = 2000
-    for j, data in enumerate(loader):
+    for j, data in enumerate(testLoaderIn):
         if count > lim:
             break
         images, labels = data
@@ -87,7 +87,7 @@ def eval_ood_detector(args):
             activation_log.append(feature.data.cpu().numpy().reshape(curr_batch_size, dim, -1).mean(2))
 
         count += len(images)
-        print("THRESHOLD ESTIMATION {:4}/{:4} images processed".format(count, len(loader.dataset)))
+        print("THRESHOLD ESTIMATION {:4}/{:4} images processed".format(count, len(testLoaderIn.dataset)))
 
     activation_log = np.concatenate(activation_log, axis=0)
     # from scipy import stats

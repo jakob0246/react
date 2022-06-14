@@ -44,10 +44,10 @@ def eval_ood_detector(args, mode_args):
     if not os.path.exists(in_save_dir):
         os.makedirs(in_save_dir)
 
-    loader_in_dict = get_loader_in(args, split=('val'))
-    testloaderIn, num_classes = loader_in_dict.val_loader, loader_in_dict.num_classes
+    loader_in_dict = get_loader_in(args)
+    trainLoaderIn, testloaderIn, num_classes = loader_in_dict.train_loader, loader_in_dict.val_loader, loader_in_dict.num_classes
     method_args['num_classes'] = num_classes
-    model = get_model(args, num_classes, load_ckpt=True)
+    model = get_model(args, num_classes, trainLoaderIn, load_ckpt=False)
 
     t0 = time.time()
 
@@ -56,7 +56,7 @@ def eval_ood_detector(args, mode_args):
         g1 = open(os.path.join(in_save_dir, "in_labels.txt"), 'w')
 
     ########################################In-distribution###########################################
-        print("Processing in-distribution images")
+        print("Testing in-distribution images")
         N = len(testloaderIn.dataset)
         count = 0
         for j, data in enumerate(testloaderIn):
@@ -105,7 +105,7 @@ def eval_ood_detector(args, mode_args):
         testloaderOut = get_loader_out(args, (None, out_dataset), split='val').val_ood_loader
     ###################################Out-of-Distributions#####################################
         t0 = time.time()
-        print("Processing out-of-distribution images")
+        print("Testing out-of-distribution images")
 
         N = len(testloaderOut.dataset)
         count = 0
@@ -152,11 +152,20 @@ if __name__ == '__main__':
                 "resnet50_cl1.0": 0.0,
                 "mobilenet": 0.03,
                 "mobilenet_cl1.3": 0.04,
+            },
+            "rsicd_in": {
+                "resnet50": 0.05
+            },
+            "rice_in": {
+                "resnet50": 0.5
+            },
+            "sen12ms_in": {
+                "resnet50": 0.0005
             }
         }
         args.method_args['magnitude'] = param_dict[args.in_dataset][args.name]
     if args.method == 'mahalanobis':
-        sample_mean, precision, lr_weights, lr_bias, magnitude = np.load(os.path.join('output/mahalanobis_hyperparams/', args.in_dataset, args.name, 'results.npy'), allow_pickle=True)
+        sample_mean, precision, lr_weights, lr_bias, magnitude = np.load(os.path.join('output', 'mahalanobis_hyperparams', args.in_dataset, args.name, 'results.npy'), allow_pickle=True)
         regressor = LogisticRegressionCV(cv=2).fit([[0,0,0,0],[0,0,0,0],[1,1,1,1],[1,1,1,1]], [0,0,1,1])
         regressor.coef_ = lr_weights
         regressor.intercept_ = lr_bias

@@ -4,7 +4,7 @@ import torchvision
 from torchvision import transforms
 from easydict import EasyDict
 
-imagesize = 32
+imagesize = 224
 
 transform_test = transforms.Compose([
     transforms.Resize((imagesize, imagesize)),
@@ -37,6 +37,14 @@ transform_test_largescale = transforms.Compose([
                          std=[0.229, 0.224, 0.225]),
 ])
 
+transform_train_mnist = transforms.Compose([
+    transforms.Resize(224),
+    transforms.RandomResizedCrop(224),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+])
+
 kwargs = {'num_workers': 2, 'pin_memory': True}
 
 def get_loader_in(args, config_type='default', split=('train', 'val')):
@@ -47,6 +55,7 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
             'batch_size': args.batch_size,
             'transform_test_largescale': transform_test_largescale,
             'transform_train_largescale': transform_train_largescale,
+            'transform_train_mnist': transform_train_largescale,
         },
     })[config_type]
 
@@ -81,6 +90,66 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
                 torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_test_largescale),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
         num_classes = 1000
+    elif args.in_dataset == "rsicd_in":
+        root = os.path.join("datasets", "id_data", "rsicd_in")
+        # Data loading code
+        if 'train' in split:
+            train_loader = torch.utils.data.DataLoader(
+                torchvision.datasets.ImageFolder(os.path.join(root, 'train'), config.transform_train),
+                batch_size=config.batch_size, shuffle=True, **kwargs)
+        if 'val' in split:
+            val_loader = torch.utils.data.DataLoader(
+                torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_test),
+                batch_size=config.batch_size, shuffle=True, **kwargs)
+        num_classes = 23
+    elif args.in_dataset == "mnist_fashion_in":
+        root = os.path.join("datasets", "id_data", "mnist_fashion_in")
+        # Data loading code
+        if 'train' in split:
+            train_loader = torch.utils.data.DataLoader(
+                torchvision.datasets.ImageFolder(os.path.join(root, 'train'), config.transform_train_mnist),
+                batch_size=config.batch_size, shuffle=True, **kwargs)
+        if 'val' in split:
+            val_loader = torch.utils.data.DataLoader(
+                torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_test),
+                batch_size=config.batch_size, shuffle=True, **kwargs)
+        num_classes = 7
+    elif args.in_dataset == "xview2_in":
+        root = os.path.join("datasets", "id_data", "xview2_in")
+        # Data loading code
+        if 'train' in split:
+            train_loader = torch.utils.data.DataLoader(
+                torchvision.datasets.ImageFolder(os.path.join(root, 'train'), config.transform_train),
+                batch_size=config.batch_size, shuffle=True, **kwargs)
+        if 'val' in split:
+            val_loader = torch.utils.data.DataLoader(
+                torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_test),
+                batch_size=config.batch_size, shuffle=True, **kwargs)
+        num_classes = 7
+    elif args.in_dataset == "rice_in":
+        root = os.path.join("datasets", "id_data", "rice_in")
+        # Data loading code
+        if 'train' in split:
+            train_loader = torch.utils.data.DataLoader(
+                torchvision.datasets.ImageFolder(os.path.join(root, 'train'), config.transform_train),
+                batch_size=config.batch_size, shuffle=True, **kwargs)
+        if 'val' in split:
+            val_loader = torch.utils.data.DataLoader(
+                torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_test),
+                batch_size=config.batch_size, shuffle=True, **kwargs)
+        num_classes = 3
+    elif args.in_dataset == "sen12ms_in":
+        root = os.path.join("datasets", "id_data", "sen12ms_in")
+        # Data loading code
+        if 'train' in split:
+            train_loader = torch.utils.data.DataLoader(
+                torchvision.datasets.ImageFolder(os.path.join(root, 'train'), config.transform_train),
+                batch_size=config.batch_size, shuffle=True, **kwargs)
+        if 'val' in split:
+            val_loader = torch.utils.data.DataLoader(
+                torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_test),
+                batch_size=config.batch_size, shuffle=True, **kwargs)
+        num_classes = 3
 
     return EasyDict({
         "train_loader": train_loader,
@@ -132,12 +201,12 @@ def get_loader_out(args, dataset=(''), config_type='default', split=('train', 'v
                                                           transform=config.transform_test_largescale), batch_size=batch_size, shuffle=False, num_workers=2)
         elif val_dataset == 'sun50':
             val_ood_loader = torch.utils.data.DataLoader(
-                torchvision.datasets.ImageFolder(os.path.join(".", "datasets", "ood_data", "SUN").format(val_dataset),
+                torchvision.datasets.ImageFolder(os.path.join(".", "datasets", "ood_data", "SUN"),
                                                  transform=config.transform_test_largescale), batch_size=batch_size, shuffle=False,
                 num_workers=2)
         elif val_dataset == 'inat':
             val_ood_loader = torch.utils.data.DataLoader(
-                torchvision.datasets.ImageFolder(os.path.join(".", "datasets", "ood_data", "iNaturalist").format(val_dataset),
+                torchvision.datasets.ImageFolder(os.path.join(".", "datasets", "ood_data", "iNaturalist"),
                                                  transform=config.transform_test_largescale), batch_size=batch_size, shuffle=False,
                 num_workers=2)
         elif val_dataset == 'imagenet':
@@ -145,8 +214,8 @@ def get_loader_out(args, dataset=(''), config_type='default', split=('train', 'v
                 torchvision.datasets.ImageFolder(os.path.join(".", "datasets", "id_data", "imagenet", "val"), config.transform_test_largescale),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
         else:
-            val_ood_loader = torch.utils.data.DataLoader(torchvision.datasets.ImageFolder("./datasets/ood_data/{}".format(val_dataset),
-                                                          transform=transform_test), batch_size=batch_size, shuffle=False, num_workers=2)
+            val_ood_loader = torch.utils.data.DataLoader(torchvision.datasets.ImageFolder(os.path.join(".", "datasets", "ood_data", val_dataset),
+                                                         transform=transform_test), batch_size=batch_size, shuffle=False, num_workers=2)
 
     return EasyDict({
         "train_ood_loader": train_ood_loader,
