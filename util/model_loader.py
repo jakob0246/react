@@ -40,7 +40,6 @@ def get_model(args, num_classes, trainLoaderIn, load_ckpt=True):
 
     if not args.pretrained:
         train_model(args, model, trainLoaderIn)
-        torch.save(model.state_dict(), os.path.join("models", "saves", f"{ args.model_arch }_{ args.in_dataset }.pth"))
 
     model.eval()
     # get the number of model parameters
@@ -70,3 +69,4 @@ def train_model(args, model, trainLoaderIn):
                 current = batch * len(images)
                 print(f"\tloss: { loss_printable } [{ current }/{ size }]")
 
+        torch.save(model.state_dict(), os.path.join("models", "saves", f"{args.model_arch}_{args.in_dataset}.pth"))
