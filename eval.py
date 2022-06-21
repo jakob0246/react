@@ -44,8 +44,8 @@ def eval_ood_detector(args, mode_args):
     if not os.path.exists(in_save_dir):
         os.makedirs(in_save_dir)
 
-    loader_in_dict = get_loader_in(args)
-    trainLoaderIn, testloaderIn, num_classes = loader_in_dict.train_loader, loader_in_dict.val_loader, loader_in_dict.num_classes
+    loader_in_dict = get_loader_in(args, split=("train", "val", "test")) if args.use_test_split else get_loader_in(args)
+    trainLoaderIn, testloaderIn, num_classes = loader_in_dict.train_loader, loader_in_dict.val_test_loader, loader_in_dict.num_classes
     method_args['num_classes'] = num_classes
     model = get_model(args, num_classes, trainLoaderIn, load_ckpt=False)
 
@@ -56,7 +56,7 @@ def eval_ood_detector(args, mode_args):
         g1 = open(os.path.join(in_save_dir, "in_labels.txt"), 'w')
 
     ########################################In-distribution###########################################
-        print("Testing in-distribution images")
+        print("Testing in-distribution images using", "test" if args.use_test_split else "val")
         N = len(testloaderIn.dataset)
         count = 0
         for j, data in enumerate(testloaderIn):

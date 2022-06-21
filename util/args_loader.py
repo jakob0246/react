@@ -26,6 +26,7 @@ def get_args():
     parser.add_argument('--base-dir', default='output/ood_scores', type=str, help='result directory')
 
     parser.add_argument('--pretrained', action='store_true')
+    parser.add_argument('--use-test-split', action='store_true')
 
     parser.set_defaults(argument=True)
     args = parser.parse_args()

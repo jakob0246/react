@@ -59,7 +59,7 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
         },
     })[config_type]
 
-    train_loader, val_loader, lr_schedule, num_classes = None, None, [50, 75, 90], 0
+    train_loader, val_test_loader, lr_schedule, num_classes = None, None, [50, 75, 90], 0
     if args.in_dataset == "CIFAR-10":
         # Data loading code
         if 'train' in split:
@@ -67,7 +67,7 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
             train_loader = torch.utils.data.DataLoader(trainset, batch_size=config.batch_size, shuffle=True, **kwargs)
         if 'val' in split:
             valset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform_test)
-            val_loader = torch.utils.data.DataLoader(valset, batch_size=config.batch_size, shuffle=True, **kwargs)
+            val_test_loader = torch.utils.data.DataLoader(valset, batch_size=config.batch_size, shuffle=True, **kwargs)
         num_classes = 10
     elif args.in_dataset == "CIFAR-100":
         # Data loading code
@@ -76,7 +76,7 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
             train_loader = torch.utils.data.DataLoader(trainset, batch_size=config.batch_size, shuffle=True, **kwargs)
         if 'val' in split:
             valset = torchvision.datasets.CIFAR100(root='./data', train=False, download=True, transform=config.transform_test)
-            val_loader = torch.utils.data.DataLoader(valset, batch_size=config.batch_size, shuffle=True, **kwargs)
+            val_test_loader = torch.utils.data.DataLoader(valset, batch_size=config.batch_size, shuffle=True, **kwargs)
         num_classes = 100
     elif args.in_dataset == "imagenet":
         root = os.path.join("datasets", "id_data", "imagenet")
@@ -86,7 +86,7 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
                 torchvision.datasets.ImageFolder(os.path.join(root, 'train'), config.transform_train_largescale),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
         if 'val' in split:
-            val_loader = torch.utils.data.DataLoader(
+            val_test_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_test_largescale),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
         num_classes = 1000
@@ -98,8 +98,12 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
                 torchvision.datasets.ImageFolder(os.path.join(root, 'train'), config.transform_train),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
         if 'val' in split:
-            val_loader = torch.utils.data.DataLoader(
+            val_test_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_test),
+                batch_size=config.batch_size, shuffle=True, **kwargs)
+        if 'test' in split:
+            val_test_loader = torch.utils.data.DataLoader(
+                torchvision.datasets.ImageFolder(os.path.join(root, 'test'), config.transform_test),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
         num_classes = 23
     elif args.in_dataset == "mnist_fashion_in":
@@ -110,7 +114,7 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
                 torchvision.datasets.ImageFolder(os.path.join(root, 'train'), config.transform_train_mnist),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
         if 'val' in split:
-            val_loader = torch.utils.data.DataLoader(
+            val_test_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_test),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
         num_classes = 7
@@ -122,7 +126,7 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
                 torchvision.datasets.ImageFolder(os.path.join(root, 'train'), config.transform_train),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
         if 'val' in split:
-            val_loader = torch.utils.data.DataLoader(
+            val_test_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_test),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
         num_classes = 7
@@ -134,7 +138,7 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
                 torchvision.datasets.ImageFolder(os.path.join(root, 'train'), config.transform_train),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
         if 'val' in split:
-            val_loader = torch.utils.data.DataLoader(
+            val_test_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_test),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
         num_classes = 3
@@ -146,14 +150,14 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
                 torchvision.datasets.ImageFolder(os.path.join(root, 'train'), config.transform_train),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
         if 'val' in split:
-            val_loader = torch.utils.data.DataLoader(
+            val_test_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_test),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
         num_classes = 3
 
     return EasyDict({
         "train_loader": train_loader,
-        "val_loader": val_loader,
+        "val_test_loader": val_test_loader,
         "lr_schedule": lr_schedule,
         "num_classes": num_classes,
     })
