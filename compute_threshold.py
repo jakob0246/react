@@ -50,7 +50,7 @@ def eval_ood_detector(args):
         os.makedirs(in_save_dir)
 
     loader_in_dict = get_loader_in(args)
-    trainLoaderIn, testLoaderIn, num_classes = loader_in_dict.train_loader, loader_in_dict.val_loader, loader_in_dict.num_classes
+    trainLoaderIn, testLoaderIn, num_classes = loader_in_dict.train_loader, loader_in_dict.val_test_loader, loader_in_dict.num_classes
     # method_args['num_classes'] = num_classes
     model = get_model(args, num_classes, trainLoaderIn, load_ckpt=False)
 

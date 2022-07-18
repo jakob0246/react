@@ -45,6 +45,30 @@ transform_train_mnist = transforms.Compose([
     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
 ])
 
+transform_fashion = transforms.Compose([
+    transforms.Resize(224),
+    transforms.ToTensor(),
+    transforms.Normalize((0.3201, 0.3182, 0.3629), (0.1804, 0.3569, 0.1131))
+])
+
+transform_cifar10 = transforms.Compose([
+    transforms.Resize(224),
+    transforms.ToTensor(),
+    transforms.Normalize((0.4881, 0.4660, 0.3994), (0.2380, 0.2322, 0.2413))
+])
+
+transform_sen12ms = transforms.Compose([
+    transforms.Resize(224),
+    transforms.ToTensor(),
+    transforms.Normalize((0.1674, 0.1735, 0.2059), (0.1512, 0.1152, 0.1645))
+])
+
+transform_so2sat = transforms.Compose([
+    transforms.Resize(224),
+    transforms.ToTensor(),
+    transforms.Normalize((0.2380, 0.3153, 0.5004), (0.0798, 0.1843, 0.0666))
+])
+
 kwargs = {'num_workers': 2, 'pin_memory': True}
 
 def get_loader_in(args, config_type='default', split=('train', 'val')):
@@ -56,6 +80,10 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
             'transform_test_largescale': transform_test_largescale,
             'transform_train_largescale': transform_train_largescale,
             'transform_train_mnist': transform_train_largescale,
+            'transform_sen12ms': transform_sen12ms,
+            'transform_fashion': transform_fashion,
+            'transform_cifar10': transform_cifar10,
+            'transform_so2sat': transform_so2sat
         },
     })[config_type]
 
@@ -111,14 +139,18 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
         # Data loading code
         if 'train' in split:
             train_loader = torch.utils.data.DataLoader(
-                torchvision.datasets.ImageFolder(os.path.join(root, 'train'), config.transform_train_mnist),
+                torchvision.datasets.ImageFolder(os.path.join(root, 'train'), config.transform_fashion),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
         if 'val' in split:
             val_test_loader = torch.utils.data.DataLoader(
-                torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_test),
+                torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_fashion),
+                batch_size=config.batch_size, shuffle=True, **kwargs)
+        if 'test' in split:
+            val_test_loader = torch.utils.data.DataLoader(
+                torchvision.datasets.ImageFolder(os.path.join(root, 'test'), config.transform_fashion),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
         num_classes = 7
-    elif args.in_dataset == "xview2_in":
+    elif args.in_dataset == "xView2_in":
         root = os.path.join("datasets", "id_data", "xview2_in")
         # Data loading code
         if 'train' in split:
@@ -128,6 +160,10 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
         if 'val' in split:
             val_test_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_test),
+                batch_size=config.batch_size, shuffle=True, **kwargs)
+        if 'test' in split:
+            val_test_loader = torch.utils.data.DataLoader(
+                torchvision.datasets.ImageFolder(os.path.join(root, 'test'), config.transform_test),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
         num_classes = 7
     elif args.in_dataset == "rice_in":
@@ -147,13 +183,49 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
         # Data loading code
         if 'train' in split:
             train_loader = torch.utils.data.DataLoader(
-                torchvision.datasets.ImageFolder(os.path.join(root, 'train'), config.transform_train),
+                torchvision.datasets.ImageFolder(os.path.join(root, 'train'), config.transform_sen12ms),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
         if 'val' in split:
             val_test_loader = torch.utils.data.DataLoader(
-                torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_test),
+                torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_sen12ms),
+                batch_size=config.batch_size, shuffle=True, **kwargs)
+        if 'test' in split:
+            val_test_loader = torch.utils.data.DataLoader(
+                torchvision.datasets.ImageFolder(os.path.join(root, 'test'), config.transform_sen12ms),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
         num_classes = 3
+    elif args.in_dataset == "cifar10_in":
+        root = os.path.join("datasets", "id_data", "cifar10_in")
+        # Data loading code
+        if 'train' in split:
+            train_loader = torch.utils.data.DataLoader(
+                torchvision.datasets.ImageFolder(os.path.join(root, 'train'), config.transform_cifar10),
+                batch_size=config.batch_size, shuffle=True, **kwargs)
+        if 'val' in split:
+            val_test_loader = torch.utils.data.DataLoader(
+                torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_cifar10),
+                batch_size=config.batch_size, shuffle=True, **kwargs)
+        if 'test' in split:
+            val_test_loader = torch.utils.data.DataLoader(
+                torchvision.datasets.ImageFolder(os.path.join(root, 'test'), config.transform_cifar10),
+                batch_size=config.batch_size, shuffle=True, **kwargs)
+        num_classes = 6
+    elif args.in_dataset == "so2sat_in":
+        root = os.path.join("datasets", "id_data", "so2sat_in")
+        # Data loading code
+        if 'train' in split:
+            train_loader = torch.utils.data.DataLoader(
+                torchvision.datasets.ImageFolder(os.path.join(root, 'train'), config.transform_so2sat),
+                batch_size=config.batch_size, shuffle=True, **kwargs)
+        if 'val' in split:
+            val_test_loader = torch.utils.data.DataLoader(
+                torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_so2sat),
+                batch_size=config.batch_size, shuffle=True, **kwargs)
+        if 'test' in split:
+            val_test_loader = torch.utils.data.DataLoader(
+                torchvision.datasets.ImageFolder(os.path.join(root, 'test'), config.transform_so2sat),
+                batch_size=config.batch_size, shuffle=True, **kwargs)
+        num_classes = 10
 
     return EasyDict({
         "train_loader": train_loader,
@@ -170,6 +242,7 @@ def get_loader_out(args, dataset=(''), config_type='default', split=('train', 'v
             'transform_test': transform_test,
             'transform_test_largescale': transform_test_largescale,
             'transform_train_largescale': transform_train_largescale,
+            'transform_sen12ms': transform_sen12ms,
             'batch_size': args.batch_size
         },
     })[config_type]
@@ -217,6 +290,9 @@ def get_loader_out(args, dataset=(''), config_type='default', split=('train', 'v
             val_ood_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(".", "datasets", "id_data", "imagenet", "val"), config.transform_test_largescale),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
+        elif val_dataset == 'sen12ms_out':
+            val_ood_loader = torch.utils.data.DataLoader(torchvision.datasets.ImageFolder(os.path.join(".", "datasets", "ood_data", val_dataset),
+                                                         transform=transform_sen12ms), batch_size=batch_size, shuffle=False, num_workers=2)
         else:
             val_ood_loader = torch.utils.data.DataLoader(torchvision.datasets.ImageFolder(os.path.join(".", "datasets", "ood_data", val_dataset),
                                                          transform=transform_test), batch_size=batch_size, shuffle=False, num_workers=2)
