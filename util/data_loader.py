@@ -193,7 +193,7 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
             val_test_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(root, 'test'), config.transform_sen12ms),
                 batch_size=config.batch_size, shuffle=True, **kwargs)
-        num_classes = 3
+        num_classes = 9
     elif args.in_dataset == "cifar10_in":
         root = os.path.join("datasets", "id_data", "cifar10_in")
         # Data loading code
@@ -293,6 +293,15 @@ def get_loader_out(args, dataset=(''), config_type='default', split=('train', 'v
         elif val_dataset == 'sen12ms_out':
             val_ood_loader = torch.utils.data.DataLoader(torchvision.datasets.ImageFolder(os.path.join(".", "datasets", "ood_data", val_dataset),
                                                          transform=transform_sen12ms), batch_size=batch_size, shuffle=False, num_workers=2)
+        elif val_dataset == 'so2sat_out':
+            val_ood_loader = torch.utils.data.DataLoader(torchvision.datasets.ImageFolder(os.path.join(".", "datasets", "ood_data", val_dataset),
+                                                         transform=transform_so2sat), batch_size=batch_size, shuffle=False, num_workers=2)
+        elif val_dataset == 'mnist_fashion_out':
+            val_ood_loader = torch.utils.data.DataLoader(torchvision.datasets.ImageFolder(os.path.join(".", "datasets", "ood_data", val_dataset),
+                                                         transform=transform_fashion), batch_size=batch_size, shuffle=False, num_workers=2)
+        elif val_dataset == 'cifar10_out':
+            val_ood_loader = torch.utils.data.DataLoader(torchvision.datasets.ImageFolder(os.path.join(".", "datasets", "ood_data", val_dataset),
+                                                         transform=transform_cifar10), batch_size=batch_size, shuffle=False, num_workers=2)
         else:
             val_ood_loader = torch.utils.data.DataLoader(torchvision.datasets.ImageFolder(os.path.join(".", "datasets", "ood_data", val_dataset),
                                                          transform=transform_test), batch_size=batch_size, shuffle=False, num_workers=2)

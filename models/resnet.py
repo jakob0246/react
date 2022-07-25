@@ -308,6 +308,15 @@ class ResNet(AbstractResNet):
         x = self.maxpool(self.relu(self.bn1(self.conv1(x))))
         x= self.layer4(self.layer3(self.layer2(self.layer1(x))))
         x = self.avgpool(x)
+
+        #import csv
+        #f = open('output/activations/activations.csv', 'w')
+        #activations = torch.reshape(x[1], (-1,)).tolist()
+        #writer = csv.writer(f)
+        #print(activations)
+        #writer.writerow(activations)
+        #f.close()
+
         x = x.clip(max=threshold)
         x = x.view(x.size(0), -1)
         x = self.fc(x)

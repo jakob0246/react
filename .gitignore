@@ -16,9 +16,14 @@ sen12ms_in/
 sen12ms_out/
 cifar10_in/
 cifar10_out/
+so2sat_in/
+so2sat_out/
 
 # Python
 __pycache__
 
 # Models
 saves/
+
+# Outputs
+activations.csv
