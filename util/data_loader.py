@@ -128,11 +128,11 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
         if 'val' in split:
             val_test_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_test),
-                batch_size=config.batch_size, shuffle=True, **kwargs)
+                batch_size=config.batch_size, shuffle=False, **kwargs)
         if 'test' in split:
             val_test_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(root, 'test'), config.transform_test),
-                batch_size=config.batch_size, shuffle=True, **kwargs)
+                batch_size=config.batch_size, shuffle=False, **kwargs)
         num_classes = 23
     elif args.in_dataset == "mnist_fashion_in":
         root = os.path.join("datasets", "id_data", "mnist_fashion_in")
@@ -144,11 +144,11 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
         if 'val' in split:
             val_test_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_fashion),
-                batch_size=config.batch_size, shuffle=True, **kwargs)
+                batch_size=config.batch_size, shuffle=False, **kwargs)
         if 'test' in split:
             val_test_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(root, 'test'), config.transform_fashion),
-                batch_size=config.batch_size, shuffle=True, **kwargs)
+                batch_size=config.batch_size, shuffle=False, **kwargs)
         num_classes = 7
     elif args.in_dataset == "xView2_in":
         root = os.path.join("datasets", "id_data", "xview2_in")
@@ -160,11 +160,11 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
         if 'val' in split:
             val_test_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_test),
-                batch_size=config.batch_size, shuffle=True, **kwargs)
+                batch_size=config.batch_size, shuffle=False, **kwargs)
         if 'test' in split:
             val_test_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(root, 'test'), config.transform_test),
-                batch_size=config.batch_size, shuffle=True, **kwargs)
+                batch_size=config.batch_size, shuffle=False, **kwargs)
         num_classes = 7
     elif args.in_dataset == "rice_in":
         root = os.path.join("datasets", "id_data", "rice_in")
@@ -188,11 +188,11 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
         if 'val' in split:
             val_test_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_sen12ms),
-                batch_size=config.batch_size, shuffle=True, **kwargs)
+                batch_size=config.batch_size, shuffle=False, **kwargs)
         if 'test' in split:
             val_test_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(root, 'test'), config.transform_sen12ms),
-                batch_size=config.batch_size, shuffle=True, **kwargs)
+                batch_size=config.batch_size, shuffle=False, **kwargs)
         num_classes = 9
     elif args.in_dataset == "cifar10_in":
         root = os.path.join("datasets", "id_data", "cifar10_in")
@@ -204,11 +204,11 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
         if 'val' in split:
             val_test_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_cifar10),
-                batch_size=config.batch_size, shuffle=True, **kwargs)
+                batch_size=config.batch_size, shuffle=False, **kwargs)
         if 'test' in split:
             val_test_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(root, 'test'), config.transform_cifar10),
-                batch_size=config.batch_size, shuffle=True, **kwargs)
+                batch_size=config.batch_size, shuffle=False, **kwargs)
         num_classes = 6
     elif args.in_dataset == "so2sat_in":
         root = os.path.join("datasets", "id_data", "so2sat_in")
@@ -220,11 +220,11 @@ def get_loader_in(args, config_type='default', split=('train', 'val')):
         if 'val' in split:
             val_test_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(root, 'val'), config.transform_so2sat),
-                batch_size=config.batch_size, shuffle=True, **kwargs)
+                batch_size=config.batch_size, shuffle=False, **kwargs)
         if 'test' in split:
             val_test_loader = torch.utils.data.DataLoader(
                 torchvision.datasets.ImageFolder(os.path.join(root, 'test'), config.transform_so2sat),
-                batch_size=config.batch_size, shuffle=True, **kwargs)
+                batch_size=config.batch_size, shuffle=False, **kwargs)
         num_classes = 10
 
     return EasyDict({

@@ -13,6 +13,8 @@ from util.data_loader import get_loader_in, get_loader_out
 from util.model_loader import get_model
 from score import get_score
 
+import csv
+
 
 def forward_fun(args):
     def forward_threshold(inputs, model):
@@ -51,6 +53,11 @@ def eval_ood_detector(args, mode_args):
 
     t0 = time.time()
 
+    all_results = []
+
+    for image in testloaderIn.dataset.imgs:
+        all_results.append([image[0].split("\\")[5]])
+
     if True:
         f1 = open(os.path.join(in_save_dir, "in_scores.txt"), 'w')
         g1 = open(os.path.join(in_save_dir, "in_labels.txt"), 'w')
@@ -77,10 +84,12 @@ def eval_ood_detector(args, mode_args):
 
                 for k in range(preds.shape[0]):
                     g1.write("{} {} {}\n".format(labels[k], preds[k], confs[k]))
+                    all_results[j * args.batch_size + k].extend(outputs[k].tolist())
 
             scores = get_score(inputs, model, forward_threshold, method, method_args, logits=logits)
-            for score in scores:
+            for l, score in enumerate(scores):
                 f1.write("{}\n".format(score))
+                all_results[j * args.batch_size + l].append(score)
 
             count += curr_batch_size
             print("{:4}/{:4} images processed, {:.1f} seconds used.".format(count, N, time.time()-t0))
@@ -103,6 +112,10 @@ def eval_ood_detector(args, mode_args):
             os.makedirs(out_save_dir)
 
         testloaderOut = get_loader_out(args, (None, out_dataset), split='val').val_ood_loader
+
+        for image in testloaderOut.dataset.imgs:
+            all_results.append([image[0].split("\\")[5]])
+
     ###################################Out-of-Distributions#####################################
         t0 = time.time()
         print("Testing out-of-distribution images")
@@ -119,16 +132,37 @@ def eval_ood_detector(args, mode_args):
 
             with torch.no_grad():
                 logits = forward_threshold(inputs, model)
+                outputs = F.softmax(logits, dim=1)
+                outputs = outputs.detach().cpu().numpy()
+
+                for k in range(outputs.shape[0]):
+                    all_results[len(testloaderIn.dataset) + j * args.batch_size + k].extend(outputs[k].tolist())
 
             scores = get_score(inputs, model, forward_threshold, method, method_args, logits=logits)
-            for score in scores:
+            for l, score in enumerate(scores):
                 f2.write("{}\n".format(score))
+                all_results[len(testloaderIn.dataset) + j * args.batch_size + l].append(score)
 
             count += curr_batch_size
             print("{:4}/{:4} images processed, {:.1f} seconds used.".format(count, N, time.time()-t0))
             t0 = time.time()
 
         f2.close()
+
+    dataset_name = args.in_dataset
+    if "_in" in dataset_name:
+        dataset_name = dataset_name.replace("_in", "")
+    if "_out" in dataset_name:
+        dataset_name = dataset_name.replace("_out", "")
+    method_name = args.method
+    if method_name == "msp":
+        method_name = "softmax"
+    file_all_results = open(os.path.join(in_save_dir, "result_" + dataset_name + "_" + method_name + ".csv"), 'w', newline='')
+
+    writer = csv.writer(file_all_results)
+    writer.writerow(["ID"] + trainLoaderIn.dataset.classes + ["OOD Score"])
+    writer.writerows(all_results)
+    file_all_results.close()
 
     return
 
